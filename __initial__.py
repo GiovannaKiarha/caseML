@@ -3,13 +3,13 @@ from math import radians, cos, sin, asin, sqrt #realizar o cálculo de haversine
 
 #haversine vai ser utilizado aqui pois leva em consideração a curvatura da terra, usa os dados que foram dados E JÁ COLOCA EM KM. Sendo assim, eu não preciso fazer outra função só para isso
 
-def haversine(lon1, lat1, lon2, lat2): 
+def calculate_distance(lon1, lat1, lon2, lat2): 
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
 
-    dlon = lon2 - lon1 
-    dlat = lat2 - lat1 
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-    c = 2 * asin(sqrt(a)) 
+    distancia_lon = lon2 - lon1 
+    distancia_lat = lat2 - lat1 
+    a = sin(distancia_lat/2)**2 + cos(lat1) * cos(lat2) * sin(distancia_lon/2)**2
+    c = 2 * asin(sqrt(a)) # raiz quadrada
     r = 6371 #raio da terra aproximadamente
     return c * r
 
@@ -22,6 +22,14 @@ def validate_coordinates(row): # precisa validar os dados pois tem muitos dados 
        return False
     if row['end_lat'] == '':
        return False
+    if row['start_lng'] == 'null':
+        return False
+    if row['end_lng'] == 'null':
+        return False
+    if row['start_lat'] == 'null':
+        return False
+    if row['end_lat'] == 'null':
+        return False
     return True
 
 csv_len = 0 #tamanho do csv
@@ -48,7 +56,7 @@ with open("train.csv") as train:
         end_lng = float(row['end_lng'] )
         end_lat = float(row['end_lat'])
         
-        distance = haversine(start_lng, start_lat, end_lng, end_lat)
+        distance = calculate_distance(start_lng, start_lat, end_lng, end_lat)
         speed_kph = distance / (float(row['duration']) / 3600)
 
         if (speed_kph > 300): #existem valores na tabela que ultrapassam o valor de 300km/h, o que acaba prejudicando o código e não fazendo rodar
